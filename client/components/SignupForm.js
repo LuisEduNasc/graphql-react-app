@@ -3,21 +3,20 @@ import { graphql } from 'react-apollo';
 import { useNavigate } from 'react-router-dom'
 
 import AuthForm from './AuthForm';
-import mutation from '../mutations/Login';
+import mutation from '../mutations/Signup';
 import query from '../queries/CurrentUser';
 
 const navigate = useNavigate();
 
-class LoginForm extends Component {
+class SignupForm extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { errors: [] }
+    this.state = { errors: [] };
   }
 
-  shouldComponentUpdate(nextProps) {
-    if (!this.props.data.user && nextProps.data.user) {
-      // redirect to dashboard
+  componentDidUpdate(nextProps) {
+    if (nextProps.data.user && !this.props.data.user) {
       navigate('/dashboard');
     }
   }
@@ -26,17 +25,16 @@ class LoginForm extends Component {
     this.props.mutate({
       variables: { email, password },
       refetchQueries: [{ query }]
-    })
-    .catch(res => {
+    }).catch(res => {
       const errors = res.graphQLErrors.map(error => error.message);
       this.setState({ errors });
-    });
+    })
   }
 
   render() {
     return (
       <div>
-        <h3>Login</h3>
+        <h3>Sign Up</h3>
         <AuthForm
           errors={this.state.errors}
           onSubmit={this.onSubmit.bind(this)}
@@ -47,5 +45,5 @@ class LoginForm extends Component {
 }
 
 export default graphql(query)(
-  graphql(mutation)(LoginForm)
+  graphql(mutation)(SignupForm)
 );
